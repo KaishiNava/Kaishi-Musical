@@ -437,7 +437,7 @@
         </div>
         
         <div class="fp-cover-container">
-            <img src="" alt="Cover" class="fp-cover" id="fpCover" crossorigin="anonymous">
+            <img src="" alt="Cover" class="fp-cover" id="fpCover">
         </div>
         
         <div class="fp-info-row">
@@ -495,7 +495,7 @@
         </div>
     </nav>
 
-    <audio id="audioPlayer" crossorigin="anonymous"></audio>
+    <audio id="audioPlayer"></audio>
 
     <script>
         // State Management
@@ -506,7 +506,6 @@
         let isPlaying = false;
         let isShuffle = false;
         let repeatState = 0; // 0: Off, 1: Repeat All, 2: Repeat One
-        let playHistory = [];
 
         const audio = document.getElementById('audioPlayer');
 
@@ -648,7 +647,7 @@
                 navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
             }
 
-            // Extract Cover Color for Dynamic Background
+            // Extract Cover Color safely for Dynamic Background
             extractColorAndSetBg(document.getElementById('fpCover'));
 
             updatePlayButtons();
@@ -721,7 +720,7 @@
             } else if (repeatState === 1) {
                 btn.className = "fas fa-redo fp-ctrl-btn active";
             } else if (repeatState === 2) {
-                btn.className = "fas fa-sync-alt fp-ctrl-btn active"; // Icon indicator for Repeat One
+                btn.className = "fas fa-sync-alt fp-ctrl-btn active";
             }
         }
 
@@ -794,21 +793,25 @@
             audio.volume = e.target.value;
         });
 
-        // Dynamic Color Extractor (Canvas Based)
+        // Dynamic Color Extractor (Safely Wrapped with Canvas Try-Catch)
         function extractColorAndSetBg(imgElement) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             const img = new Image();
-            img.crossOrigin = "Anonymous";
             img.src = imgElement.src;
 
             img.onload = function() {
-                canvas.width = 1;
-                canvas.height = 1;
-                ctx.drawImage(img, 0, 0, 1, 1);
-                const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-                document.getElementById('fullPlayer').style.background = 
-                    `linear-gradient(180deg, rgb(${Math.floor(r*0.5)}, ${Math.floor(g*0.5)}, ${Math.floor(b*0.5)}) 0%, var(--bg-base) 100%)`;
+                try {
+                    canvas.width = 1;
+                    canvas.height = 1;
+                    ctx.drawImage(img, 0, 0, 1, 1);
+                    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+                    document.getElementById('fullPlayer').style.background = 
+                        `linear-gradient(180deg, rgb(${Math.floor(r*0.5)}, ${Math.floor(g*0.5)}, ${Math.floor(b*0.5)}) 0%, var(--bg-base) 100%)`;
+                } catch (e) {
+                    // Fallback apabila diblokir CORS browser
+                    document.getElementById('fullPlayer').style.background = `linear-gradient(180deg, #2a2a2a 0%, var(--bg-base) 100%)`;
+                }
             };
             img.onerror = function() {
                 document.getElementById('fullPlayer').style.background = `linear-gradient(180deg, #2a2a2a 0%, var(--bg-base) 100%)`;
