@@ -7,7 +7,7 @@ const musicDatabase = [
         id: "m1",
         title: "Terhebat",
         artist: "Hololive ID",
-        cover: "https://files.catbox.moe/eqsw3u.jpg",
-        url: "https://files.catbox.moe/yrn1zm.mp3"
+        cover: "https://zfile.web.id/Z9Y75DC.jpg",
+        url: "https://zfile.web.id/guseA4d.mp3"
     }
 ];
